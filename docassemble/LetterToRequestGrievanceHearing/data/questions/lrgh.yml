@@ -1,0 +1,192 @@
+include:
+  - docassemble.MAVirtualCourt:basic-questions.yml
+---
+comment: |
+  The metadata section controls the tab title and saved interview title. You can delete this section if you include this YAML file in another YAML file.
+metadata:
+  title: |
+    Automating a Letter to Request a Grievance Hearing
+  short title: |
+    Letter to Request a Grievance Hearing 
+---
+comment: |
+  This section is used by MAVirtualCourts to control how some of the questions work.
+mandatory: True
+code: |
+  interview_metadata # make sure we initialize the object
+  if not defined("interview_metadata['Letter_to_Request_a_Grievance_Hearing']"):
+    interview_metadata.initializeObject('Letter_to_Request_a_Grievance_Hearing')
+  interview_metadata['Letter_to_Request_a_Grievance_Hearing'].update({
+    'title': 'Letter to request a grievance hearing',
+    'short title': 'Letter to request a grievance hearing',
+    'description': 'Letter to request a grievance hearing',
+    'original_form': '',
+    'allowed courts': [
+      'Boston Municipal Court',
+      'District Court',
+      'Housing Court',
+      'Superior Court',
+    ],
+    'categories': [
+      'Housing',
+    ],
+    'logic block variable': 'Letter_to_Request_a_Grievance_Hearing',
+    'attachment block variable': 'Letter_to_Request_a_Grievance_Hearing_attachment',
+    'typical role': 'plaintiff',
+  })
+---
+features:
+  navigation: True
+---
+sections:
+  - review_Letter_to_Request_a_Grievance_Hearing: Review your answers
+---
+id: interview_order_Letter_to_Request_a_Grievance_Hearing
+code: |
+  # This is a placeholder to control logic flow in this interview
+
+  basic_questions_intro_screen 
+  Letter_to_Request_a_Grievance_Hearing_intro
+  # Set the allowed courts for this interview
+  allowed_courts = interview_metadata["Letter_to_Request_a_Grievance_Hearing"]["allowed courts"]
+  nav.set_section('review_Letter_to_Request_a_Grievance_Hearing')
+  user_role = 'plaintiff'
+  
+  # Set the answer file name.
+  set_parts(subtitle=str(users))
+  other_parties[0].address.address
+  set_progress(12.5)
+  users[0]
+  users[0].phone_number
+  set_progress(25.0)
+  signature_date
+  other_parties[0]
+  other_parties_rep
+  grievance_issues
+  users[0].address
+  set_progress(37.5)
+  other_parties[0].address
+  users[0].address.address
+  # Save (anonymized) interview statistics.
+  store_variables_snapshot(data={'zip': users[0].address.zip})
+  Letter_to_Request_a_Grievance_Hearing_preview_question # Pre-canned preview screen
+  basic_questions_signature_flow
+  users[0].signature
+  Letter_to_Request_a_Grievance_Hearing = True
+---
+comment: |
+  This question is used to introduce your interview. Please customize
+id: Letter to request a grievance hearing
+continue button field: Letter_to_Request_a_Grievance_Hearing_intro
+question: |
+  Automating Your Letter to Request a Grievance Hearing
+subquestion: |
+  Welcome! If you are a tenant who wishes to file a grievance with your housing authority, you have come to the right place. 
+  
+  First, you will be able to input all of your relevant information. After you input all of the information, a formal letter requesting a grievance hearing with your housing authority will be automated. You will then be able to to either download the letter to your computer or email the letter to the relevant parties.
+  
+  Let's get started.
+---
+id: Review your form before you sign it
+continue button field: Letter_to_Request_a_Grievance_Hearing_preview_question
+question: |
+  Review your form before you sign it
+subquestion: |
+  Here is a preview of the form you'll sign on the next page.
+
+   ${ pdf_concatenate(Letter_to_Request_a_Grievance_Hearing_attachment['preview'], filename='Letter_to_Request_a_Grievance_Hearing.pdf')}
+---
+id: First Screen
+question: |
+  Who is representing ${ other_parties }?
+fields:
+  - 'name': other_parties_rep
+---
+id: Issues
+question: |
+  What issue(s) are you experiencing?
+subquestion: |
+  Check all that apply. You may choose more than one option below. If your issue is not stated, please explain your issue in the "Other issues" textbox.
+fields:
+  - 'Problem': grievance_issues
+    datatype: checkboxes 
+    choices:
+      - I received an eviction notice telling me to leave my apartment.
+      - I have been unable to get repairs made. 
+      - I received a rent increase that is higher than what I believe my rent should be.
+      - I have been unduly charged with a damage or repair for which I am not responsible.
+  - 'Other issues': other_issues
+    datatype:  area
+    required: False
+    rows: 10
+---
+progress: 100
+mandatory: True
+id: Your form is ready to download and file
+question: |
+  Your form is ready to download and file
+subquestion: |
+  Thank you ${users}. Your form is ready to download and deliver.
+
+  Below is a preview of your form.
+
+  ${pdf_concatenate(Letter_to_Request_a_Grievance_Hearing_attachment['final'], filename='Letter_to_Request_a_Grievance_Hearing.pdf') }
+need: Letter_to_Request_a_Grievance_Hearing
+attachment code: Letter_to_Request_a_Grievance_Hearing_attachment['final']
+---
+objects:
+  - Letter_to_Request_a_Grievance_Hearing_attachment: DADict
+---
+attachment:
+    variable name: Letter_to_Request_a_Grievance_Hearing_attachment[i]
+    name: Letter to request a grievance hearing
+    filename: Letter_to_request_a_grievance_hearing
+    docx template file: Letter_to_Request_a_Grievance_Hearing.docx
+---
+id: Letter_to_Request_a_Grievance_Hearing review screen
+event: review_Letter_to_Request_a_Grievance_Hearing
+question: |
+  Placeholder Review Screen
+subquestion: |
+  Edit your answers below
+review: 
+  - Edit: other_parties_rep[0]
+    button: |
+      Other parties rep[0]:
+      ${ other_parties_rep[0] }
+  - Edit: other_parties[0].address.address
+    button: |
+      other_parties[0].address.address:
+      ${ other_parties[0].address.address }
+  - Edit: users[0].signature
+    button: |
+      users[0].signature:
+      ${ users[0].signature }
+  - Edit: users[0].name.first
+    button: |
+      users[0]:
+      ${ users[0] }
+  - Edit: users[0].number
+    button: |
+      users[0].number:
+      ${ users[0].number }
+  - Edit: signature_date
+    button: |
+      signature_date:
+      ${ signature_date }
+  - Edit: other_parties[0].name.first
+    button: |
+      other_parties[0]:
+      ${ other_parties[0] }
+  - Edit: users[0].address
+    button: |
+      users[0].address:
+      ${ users[0].address }
+  - Edit: other_parties[0].address
+    button: |
+      other_parties[0].address:
+      ${ other_parties[0].address }
+  - Edit: users[0].address.address
+    button: |
+      users[0].address.address:
+      ${ users[0].address.address }
