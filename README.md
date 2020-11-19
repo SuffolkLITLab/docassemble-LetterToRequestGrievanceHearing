@@ -1,6 +1,6 @@
 # docassemble.LetterToRequestGrievanceHearing
 
-A docassemble extension.
+This is a Letter to Request a Grievance Hearing in Massachusetts. 
 
 ## Author
 
