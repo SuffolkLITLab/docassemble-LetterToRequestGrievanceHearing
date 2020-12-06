@@ -7,7 +7,7 @@ metadata:
   title: |
     Automating a Letter to Request a Grievance Hearing
   short title: |
-    Letter to Request a Grievance Hearing 
+    LRGH 
 ---
 comment: |
   This section is used by MAVirtualCourts to control how some of the questions work.
@@ -44,7 +44,6 @@ sections:
 id: interview_order_Letter_to_Request_a_Grievance_Hearing
 code: |
   # This is a placeholder to control logic flow in this interview
-
   basic_questions_intro_screen 
   Letter_to_Request_a_Grievance_Hearing_intro
   # Set the allowed courts for this interview
@@ -59,7 +58,6 @@ code: |
   users[0]
   users[0].phone_number
   set_progress(25.0)
-  signature_date
   other_parties[0]
   other_parties_rep
   grievance_issues
@@ -81,11 +79,15 @@ continue button field: Letter_to_Request_a_Grievance_Hearing_intro
 question: |
   Automating Your Letter to Request a Grievance Hearing
 subquestion: |
-  Welcome! If you are a tenant who wishes to file a grievance with your housing authority, you have come to the right place. 
+  **Welcome!** You are here if you are a tenant residing in the state of Massachusetts who wishes to file a grievance with your housing authority. This is an automated process that will allow you to create a *"Letter Requesting a Grievance Hearing."*
   
-  First, you will be able to input all of your relevant information. After you input all of the information, a formal letter requesting a grievance hearing with your housing authority will be automated. You will then be able to to either download the letter to your computer or email the letter to the relevant parties.
+  Follow the instructions below to begin.
   
-  Let's get started.
+  1. Input your information in the relevant field boxes below. Make sure to fill in each field **accurately**. Any errors may result in your grievance hearing request being denied.  
+  2. A formal letter requesting a grievance hearing with your housing authority will be automated for you. You must place your **signature** on the letter by using the online signature tool or by placing a wet signature on the document. 
+  3. After placing your signature on the letter, you will be able to **download** your automated letter to your computer or **e-mail** the letter to any relevant parties.
+  
+  Click "Next" to begin. 
 ---
 id: Review your form before you sign it
 continue button field: Letter_to_Request_a_Grievance_Hearing_preview_question
@@ -93,14 +95,20 @@ question: |
   Review your form before you sign it
 subquestion: |
   Here is a preview of the form you'll sign on the next page.
-
    ${ pdf_concatenate(Letter_to_Request_a_Grievance_Hearing_attachment['preview'], filename='Letter_to_Request_a_Grievance_Hearing.pdf')}
 ---
 id: First Screen
 question: |
-  Who is representing ${ other_parties }?
+  Do you know who is representing the ${ other_parties }? 
+subquestion: |
+  If you do not, that is ok. It will not affect your request for a grievance hearing. Click "Next" to continue if you do not know.
 fields:
-  - 'name': other_parties_rep
+  - 'Name of Representative': other_parties_rep
+    required: False
+---
+objects:
+  - users: PeopleList.using(ask_number=True, target_number=1) # You can do the same thing for other_parties
+  - other_parties: PeopleList.using(ask_number=True, target_number=1)
 ---
 id: Issues
 question: |
@@ -127,9 +135,7 @@ question: |
   Your form is ready to download and file
 subquestion: |
   Thank you ${users}. Your form is ready to download and deliver.
-
   Below is a preview of your form.
-
   ${pdf_concatenate(Letter_to_Request_a_Grievance_Hearing_attachment['final'], filename='Letter_to_Request_a_Grievance_Hearing.pdf') }
 need: Letter_to_Request_a_Grievance_Hearing
 attachment code: Letter_to_Request_a_Grievance_Hearing_attachment['final']
@@ -190,3 +196,120 @@ review:
     button: |
       users[0].address.address:
       ${ users[0].address.address }
+---
+id: your name
+question:  |
+  What is your **legal name**?
+subquestion: |
+  State your name how it appears on your lease agreement.
+fields:
+  - First Name: users[0].name.first
+  - Middle Name: users[0].name.middle
+    required: False
+  - Last Name: users[0].name.last
+  - Suffix: users[0].name.suffix
+    code: |
+      name_suffix()
+    required: False
+---
+id: names of opposing parties
+question: |
+  % if users==plaintiffs:
+  What is the name of your **housing authority**?
+  % else:
+  Please list the name of each **plaintiff** or petitioner in this case below
+  % endif
+subquestion: |
+  State the name of your housing authority how it appears on your lease agreement. (Example: Boston Housing Authority)
+fields:
+  - Housing Authority: other_parties[i].name.first
+---
+id: persons address
+generic object: Individual
+question: |
+  What is the ${ x.possessive('**address**') }?
+fields:
+  - Street Address: x.address.address
+    address autocomplete: True
+  - Unit: x.address.unit
+    required: False
+  - City: x.address.city
+  - State: x.address.state
+    default: MA   
+    code: |
+      states_list()   
+  - Zip Code: x.address.zip
+    required: False
+---
+id: your contact information
+question: |
+  What is your **contact information**?
+subquestion: |
+  Your housing authority needs to be able to reach you to schedule your grievance hearing.
+  
+  Include at least **one** way to reach you other than by mail.
+fields:  
+  - Mobile number: users[0].mobile_number
+    required: False
+  - Other phone number: users[0].phone_number
+    required: False
+  - Email address: users[0].email    
+    datatype: email
+    required: False
+  - Other ways to reach you: users[0].other_contact_method
+    input type: area
+    required: False
+    help: |
+      If you do not have a phone number or email your housing authority can use, provide specific contact instructions. For example, use a friend's phone number. But the friend must be someone you can rely on to tell you the housing authority is trying to contact you.
+validation code: |
+  if (not showifdef('users[0].phone_number') and \
+      (not showifdef('users[0].mobile_number')) and \
+      (not showifdef('users[0].email')) and \
+      (not showifdef('users[0].other_contact_method'))):
+    validation_error(word("You need to provide at least one contact method."))
+help: |
+  Your housing authority **must** be able to reach you to schedule your grievance hearing, so you have to give them some way to do this.
+---
+code: signature_date = today()
+---
+id: your address
+question: |
+  What is your **address**?
+subquestion: |
+  What address should the housing authority use to mail papers to you?
+fields:
+  - Street address: users[0].address.address
+    address autocomplete: True
+  - Unit: users[0].address.unit
+    required: False
+  - City: users[0].address.city
+  - State: users[0].address.state
+    code: |
+      states_list()
+    default: MA      
+  - Zip: users[0].address.zip
+    required: False
+---
+id: signature choice
+decoration: file-signature
+question: |
+  **Sign** your Letter Requesting a Grievance Hearing
+subquestion: |
+  Your letter is almost ready. You need to sign it first.
+  
+  Use the mouse or touchpad on your computer or
+  sign with your finger on your phone. 
+   
+  You can send the letter to someone else to sign if you choose the "phone" option.
+field: signature_choice
+buttons:  
+  - Sign on my phone: phone
+    image: mobile-alt
+  - Sign on this computer: this device
+    image: desktop
+continue button field: saw_signature_choice
+script: |
+  <script>
+    $(".da-field-buttons > div > .btn-da-custom").last().after("<br>")
+    $(".da-field-buttons > div > .btn-da-custom").first().before("<br>")
+  </script>
