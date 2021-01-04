@@ -5,9 +5,12 @@ comment: |
   The metadata section controls the tab title and saved interview title. You can delete this section if you include this YAML file in another YAML file.
 metadata:
   title: |
-    Automating a Letter to Request a Grievance Hearing
+    Request a Grievance Hearing
   short title: |
-    LRGH 
+    Grievance Hearing
+---
+code: |
+  interview_short_title = "Request a Grievance Hearing"
 ---
 comment: |
   This section is used by MAVirtualCourts to control how some of the questions work.
