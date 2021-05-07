@@ -59,6 +59,7 @@ code: |
   set_progress(12.5)
   users[0]
   users[0].address
+  users[0].address.zip
   users[0].phone_number
   set_progress(25.0)
   other_parties[0]
@@ -74,6 +75,7 @@ code: |
   users[0].signature
   Letter_to_Request_a_Grievance_Hearing = True
   basic_questions_intro_screen = False
+  other_parties[0].address.address = False 
 ---
 id: Custom intro screen
 decoration: form-lineal
@@ -283,19 +285,6 @@ review:
       users[0].address.address:
       ${ users[0].address.address }
 ---
-id: your name
-question:  |
-  What is your name?
-fields:
-  - First Name: users[0].name.first
-  - Middle Name: users[0].name.middle
-    required: False
-  - Last Name: users[0].name.last
-  - Suffix: users[0].name.suffix
-    code: |
-      name_suffix()
-    required: False
----
 id: names of opposing parties
 question: |
   Housing Authority
@@ -304,23 +293,6 @@ subquestion: |
   *Example: Boston Housing Authority*
 fields:
   - Housing Authority: other_parties[i].name.first
----
-id: persons address
-generic object: Individual
-question: |
-  What is your address?
-fields:
-  - Street Address: x.address.address
-    address autocomplete: True
-  - Unit: x.address.unit
-    required: False
-  - City: x.address.city
-  - State: x.address.state
-    default: MA   
-    code: |
-      states_list()   
-  - Zip Code: x.address.zip
-    required: False
 ---
 id: your contact information
 question: |
