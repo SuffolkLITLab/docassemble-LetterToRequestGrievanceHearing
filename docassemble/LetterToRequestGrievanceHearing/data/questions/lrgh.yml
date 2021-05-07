@@ -73,9 +73,9 @@ code: |
   preview_screen
   basic_questions_signature_flow
   users[0].signature
-  Letter_to_Request_a_Grievance_Hearing = True
   basic_questions_intro_screen = False
-  other_parties[0].address.address = False 
+  other_parties[0].address.address = False
+  Letter_to_Request_a_Grievance_Hearing = True
 ---
 id: Custom intro screen
 decoration: form-lineal
@@ -85,9 +85,9 @@ subquestion: |
 
   The MassAccess Project can help Massachusetts residents complete and download forms in 3 steps:
   
-  Step 1. Answer the questions that will fill out your letter for you.  
+  Step 1. Answer the questions that will fill out your letter.  
   Step 2. Review and sign the form.  
-  Step 3. Download or email the final form. You will need to deliver it on your own. 
+  Step 3. Download or email yourt . You will need to deliver it on your own. 
   
   *This site is not a lawyer. If you would like a lawyer, find [your local
   legal aid provider](https://www.lsc.gov/what-legal-aid/find-legal-aid).*
@@ -227,6 +227,7 @@ subquestion: |
   ${pdf_concatenate(Letter_to_Request_a_Grievance_Hearing_attachment['final'], filename='Letter_to_Request_a_Grievance_Hearing.pdf') }
 need: Letter_to_Request_a_Grievance_Hearing
 attachment code: Letter_to_Request_a_Grievance_Hearing_attachment['final']
+continue button: end_interview
 ---
 objects:
   - Letter_to_Request_a_Grievance_Hearing_attachment: DADict
@@ -327,7 +328,7 @@ code: signature_date = today()
 id: signature choice
 decoration: file-signature
 question: |
-  **Sign** your Letter Requesting a Grievance Hearing
+  Sign your Letter Requesting a Grievance Hearing
 subquestion: |
   Your letter is almost ready. You need to sign it first.
   
