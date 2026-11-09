@@ -211,6 +211,7 @@ fields:
 progress: 100
 mandatory: True
 id: Your form is ready to download and file
+event: end_interview
 question: |
   Your lettter is ready to download
 subquestion: |
@@ -227,7 +228,6 @@ subquestion: |
   ${pdf_concatenate(Letter_to_Request_a_Grievance_Hearing_attachment['final'], filename='Letter_to_Request_a_Grievance_Hearing.pdf') }
 need: Letter_to_Request_a_Grievance_Hearing
 attachment code: Letter_to_Request_a_Grievance_Hearing_attachment['final']
-continue button: end_interview
 ---
 objects:
   - Letter_to_Request_a_Grievance_Hearing_attachment: DADict
